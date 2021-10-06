@@ -27,7 +27,7 @@
     
     
     // Handle custom routes - add the custom routes
-    // app.use('/api/v1/user', require('./routes/userRoutes'))
+     app.use('/api/products', require('./routes/ProductRoutes'))
     //app.use('/api/companies',companyRoutes);
     
     
