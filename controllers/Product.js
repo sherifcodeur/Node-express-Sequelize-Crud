@@ -10,7 +10,7 @@ const product_get = async (req,res)=>{
     let response = {};
 
 
-    // this code is to fetch all products withtout pagination
+    // this code is to fetch all products without pagination
     try {
         const allProduct = await db.Product.findAll();
         if(! allProduct){
@@ -24,6 +24,24 @@ const product_get = async (req,res)=>{
         // there is an error we send status 500
         res.status(500).send(error);        
     }
+
+
+    // this code fetch all products with cursor skip pagination
+       
+        // try {
+        //     const allProduct = await db.Product.findAll({ offset: 5, limit: 5 });
+        //     if(! allProduct){
+        //        // there is nothing to show but success
+        //         res.status(200).send(response);
+        //     }else{
+        //         // we show all products
+        //         res.status(200).send(allProduct);
+        //     }        
+        // } catch (error) {
+        //     // there is an error we send status 500
+        //     res.status(500).send(error);        
+        // }
+    
 
 
     
@@ -150,14 +168,19 @@ const product_put = async(req,res)=>{
 
         let id = req.params.id;
 
-        let updatedProduct = await Product.findByIdAndUpdate(id,req.body,{new:true})
+        let updatedProduct = await db.Product.update(
+            req.body, {
+            where: {
+              id: id
+            }
+          })
 
         if(!updatedProduct){
 
             throw new Error("no such product")
         }else{
 
-            res.status(200).send(updatedProduct)
+            res.status(200).send("success")
         }
         
     } catch (error) {
