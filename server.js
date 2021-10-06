@@ -2,7 +2,10 @@
     // importing dependencies
     const express = require('express');
     const dotenv = require('dotenv').config();
-    const dbconnection = require('./database/connection');
+
+    // db with sequelize 
+    const db = require('./models');
+    
     
     //importing routes - example company routes -
     //const companyRoutes = require('./routes/companyRoutes');
@@ -14,8 +17,7 @@
     // initializing express application
     const app = express();
     
-    // connect to the database
-    dbconnection.dbconnect();
+    
     
     
     
@@ -36,7 +38,12 @@
     
 
     // app listens on the selected Port
-    app.listen(PORT, () => {
-      console.log("Server listening ")
+    db.sequelize.sync().then(()=>{
+
+        app.listen(PORT, () => {
+          console.log("Server listening ")
+        })
+
     })
+
     
