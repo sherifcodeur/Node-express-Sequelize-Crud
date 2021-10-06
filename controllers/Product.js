@@ -232,28 +232,28 @@ const product_delete = async (req,res)=>{
 // search by name 
 const product_search = async(req,res)=>{
 
-    const query = req.query;
+    // const query = req.query;
 
-    // let response = {};
+    // // let response = {};
 
-    try {
+    // try {
 
-        const searchResult = await Product.find(  {"name":{$regex:req.query.name,$options:'$i'}} );
+    //     const searchResult = await Product.find(  {"name":{$regex:req.query.name,$options:'$i'}} );
 
-        if(!searchResult){
+    //     if(!searchResult){
 
-            throw new Error("no products in the database");
-        }else{
+    //         throw new Error("no products in the database");
+    //     }else{
 
-            res.status(200).send(searchResult);
-        }
+    //         res.status(200).send(searchResult);
+    //     }
         
-    } catch (error) {
+    // } catch (error) {
 
-        res.status(500).send(error);
+    //     res.status(500).send(error);
 
         
-    }
+    // }
 
 
 }
