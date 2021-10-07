@@ -54,7 +54,7 @@ const product_get = async (req,res)=>{
             const { page, size} = req.query;
             const { limit, offset } = getPagination(page, size);
             const data = await db.Product.findAndCountAll({ offset: offset, limit: limit });
-            console.log(data)
+            //console.log(data)
             if(! data){
                // there is nothing to show but success
                 res.status(200).send(response);
@@ -215,28 +215,33 @@ const product_delete = async (req,res)=>{
 
 }
 
-// search by name 
+// search by name and with pagination
+// example of search query get  :  http://localhost:5000/api/products/search?page=1&size=1&title=pol
 const product_search = async(req,res)=>{
 
-    const {title} = req.query;
+    const { page, size ,title} = req.query;
+    const { limit, offset } = getPagination(page, size);
+   
     //console.log(query)
 
     // let response = {};
 
     try {
 
-        const searchResult = await db.Product.findAndCountAll( {
+        const data = await db.Product.findAndCountAll( {
 
-            where: { title: { [Op.like]: `%${title}%` } }
-            }            
+            where: { title: { [Op.like]: `%${title}%` }}
+           ,offset: offset, limit: limit  }            
             );
 
-        if(!searchResult){
-
+        if(!data){
+            
             throw new Error("no products in the database");
         }else{
 
-            res.status(200).send(searchResult);
+
+            let searchresults = getPagingData(data,page,limit)
+            res.status(200).send(searchresults);
         }
         
     } catch (error) {
