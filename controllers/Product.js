@@ -5,6 +5,26 @@
 
 
 
+// getting pagination numbers and default if not provided
+
+const getPagination = (page, size) => {
+    const limit = size ? +size : 3;
+    const offset = page ? page * limit : 0;
+  
+    return { limit, offset };
+  };
+  
+  const getPagingData = (data, page, limit) => {
+    const { count: totalItems, rows: products } = data;
+    const currentPage = page ? +page : 0;
+    const totalPages = Math.ceil(totalItems / limit);
+  
+    return { totalItems, products, totalPages, currentPage };
+  };
+  
+
+
+
 // retrieve all products in the database
 const product_get = async (req,res)=>{
 
@@ -12,73 +32,42 @@ const product_get = async (req,res)=>{
 
 
     // this code is to fetch all products without pagination
-    try {
-        const allProduct = await db.Product.findAll();
-        if(! allProduct){
-           // there is nothing to show but success
-            res.status(200).send(response);
-        }else{
-            // we show all products
-            res.status(200).send(allProduct);
-        }        
-    } catch (error) {
-        // there is an error we send status 500
-        res.status(500).send(error);        
-    }
+    // try {
+    //     const allProduct = await db.Product.findAll();
+    //     if(! allProduct){
+    //        // there is nothing to show but success
+    //         res.status(200).send(response);
+    //     }else{
+    //         // we show all products
+    //         res.status(200).send(allProduct);
+    //     }        
+    // } catch (error) {
+    //     // there is an error we send status 500
+    //     res.status(500).send(error);        
+    // }
 
 
-    // this code fetch all products with cursor skip pagination
+    // this code fetch all products with limit pagination
+    // example of get query : http://localhost:5000/api/products?page=0&size=1
        
-        // try {
-        //     const allProduct = await db.Product.findAll({ offset: 5, limit: 5 });
-        //     if(! allProduct){
-        //        // there is nothing to show but success
-        //         res.status(200).send(response);
-        //     }else{
-        //         // we show all products
-        //         res.status(200).send(allProduct);
-        //     }        
-        // } catch (error) {
-        //     // there is an error we send status 500
-        //     res.status(500).send(error);        
-        // }
+        try {
+            const { page, size} = req.query;
+            const { limit, offset } = getPagination(page, size);
+            const data = await db.Product.findAndCountAll({ offset: offset, limit: limit });
+            console.log(data)
+            if(! data){
+               // there is nothing to show but success
+                res.status(200).send(response);
+            }else{
+                // we show all products
+                let allProduct = getPagingData(data,page,limit)
+                res.status(200).send(allProduct);
+            }        
+        } catch (error) {
+            // there is an error we send status 500
+            res.status(500).send(error);        
+        }
     
-
-
-    
-
-
-    // fetching allproducts with cursor based pagination
-    // Product.paginate({
-    //     limit: 1,
-    //     previous: req.query.previous || null,
-    //     next: req.query.next || null   
-    
-    // })
-    // .then((result) => {
-
-    //     console.log(result);
-
-
-    //     const links = {};
-    //     if (result.hasNext) {
-    //         links.next = `${process.env.BASE_URL}:${process.env.PORT}/api/product?next=${result.next}`;
-    //     }
-    //     if (result.hasPrevious) {
-    //         links.previous = `${process.env.BASE_URL}:${process.env.PORT}/api/product?previous=${result.previous}`;
-    //     }
-    //     //console.log("les links",links)
-    //     res.links(links);
-    //     res.status(200).send(result);
-
-    //   }).catch(err=>{
-          
-    //     res.status(200).send(response);
-
-    //   });
-
-    // end of fetching with pagination  
-
 
 }
 
@@ -90,9 +79,7 @@ const product_post = async (req,res)=>{
 
     let response = {};
 
-    try {
-
-        
+    try {      
         
         db.Product.create(req.body)
         .then((result)=>{
@@ -106,8 +93,7 @@ const product_post = async (req,res)=>{
 
             res.status(500).send(response);
         })
-
-                       
+                      
         
     } catch (error) {
 
@@ -116,7 +102,6 @@ const product_post = async (req,res)=>{
         res.status(500).send(response)
         
     }  
-
 
 }
 
