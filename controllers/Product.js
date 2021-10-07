@@ -1,6 +1,7 @@
 
     
     const db = require('../models')
+    const Op = db.Sequelize.Op;
 
 
 
@@ -232,28 +233,34 @@ const product_delete = async (req,res)=>{
 // search by name 
 const product_search = async(req,res)=>{
 
-    // const query = req.query;
+    const {title} = req.query;
+    //console.log(query)
 
-    // // let response = {};
+    // let response = {};
 
-    // try {
+    try {
 
-    //     const searchResult = await Product.find(  {"name":{$regex:req.query.name,$options:'$i'}} );
+        const searchResult = await db.Product.findAndCountAll( {
 
-    //     if(!searchResult){
+            where: { title: { [Op.like]: `%${title}%` } }
+            }            
+            );
 
-    //         throw new Error("no products in the database");
-    //     }else{
+        if(!searchResult){
 
-    //         res.status(200).send(searchResult);
-    //     }
+            throw new Error("no products in the database");
+        }else{
+
+            res.status(200).send(searchResult);
+        }
         
-    // } catch (error) {
+    } catch (error) {
 
-    //     res.status(500).send(error);
+        res.status(500).send(error);
+        console.log(error)
 
         
-    // }
+    }
 
 
 }
